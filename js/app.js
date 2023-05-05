@@ -16,7 +16,7 @@ const App = {
     currentPlayerID: 1,
   },
 
-  getGameStatus(state) {
+  getGameStatus() {
     const winningPatterns = [
       [1, 2, 3],
       [4, 5, 6],
@@ -28,34 +28,56 @@ const App = {
       [3, 5, 7],
     ];
 
-    const Player1Squares = state.Players[0].clickedSquares;
-    const Player2Squares = state.Players[1].clickedSquares;
+    const Player1Squares = App.state.Players[0].clickedSquares;
+    const Player2Squares = App.state.Players[1].clickedSquares;
+    console.log(Player1Squares);
+    console.log(Player2Squares);
 
     let winner = null;
 
-    winningPatterns.forEach((pattern) => {
-      if (state.currentPlayerID === 1) {
-        const Player1Wins = pattern.every((v) => Player1Squares.includes(v));
-        if (Player1Wins) {
-          winner = "player1";
-        }
-      } else {
-        const Player2Wins = pattern.every((v) => Player2Squares.includes(v));
-        if (Player2Wins) {
-          winner = "player2";
+    const winningCase = (clcikedSquares) => {
+      let isWin = false;
+      //   winningPatterns.forEach(
+      //     (pattern) => (isWin = pattern.every((v) => clcikedSquares.includes(v)))
+      //   );
+      //   return isWin;
+      // };
+
+      for (let i = 0; i < winningPatterns.length; i++) {
+        const pattern = winningPatterns[i];
+        isWin = pattern.every((v) => clcikedSquares.includes(v));
+        if (isWin) {
+          break;
         }
       }
 
-      // if (Player1Wins) {
-      //   winner = "player1";
-      // }
+      return isWin
+    };
 
-      // if (Player2Wins) {
-      //   winner = "player2";
-      // }
-    });
+    const winPlayer1 = winningCase(Player1Squares);
+    const winPlayer2 = winningCase(Player2Squares);
 
-    console.log(Player1Squares);
+    console.log({winPlayer1});
+    console.log({winPlayer2});
+
+    if (winningCase(Player2Squares)) {
+      winner = "player2";
+    }
+
+    // winningPatterns.forEach((pattern) => {
+    //   if (App.state.currentPlayerID === 1) {
+    //     const Player1Wins = pattern.every((v) => Player1Squares.includes(v));
+    //     if (Player1Wins) {
+    //       winner = "player1";
+    //     }
+    //   } else {
+    //     const Player2Wins = pattern.every((v) => Player2Squares.includes(v));
+    //     if (Player2Wins) {
+    //       winner = "player2";
+    //     }
+    //   }
+    // });
+
     return {
       status: "in progress",
       winner,
@@ -86,11 +108,7 @@ const App = {
         const Player1 = Players[0];
         const Player2 = Players[1];
 
-        console.log(currentPlayerID);
-
         const currentPlayer = currentPlayerID === 1 ? Player1 : Player2;
-        // console.log(Player1.clickedSquares);
-        // console.log(Player2.clickedSquares);
 
         const isSquareBusy = (squreID) => {
           const isBusy =
@@ -104,30 +122,17 @@ const App = {
           return isBusy !== undefined;
         };
 
-        // console.log(isSquareBusy(+square.id));
-
         if (isSquareBusy(+square.id)) {
           return;
         }
 
-
-        // console.log(
-        //   "this is the current player" + JSON.stringify(currentPlayer)
-        // );
-
         const icon = document.createElement("i");
-        // const classNames = {
-        //   1: ["fa-x", "yellow"],
-        //   2: ["fa-o", "turquoise"],
-        // };
 
         if (currentPlayer.id === 1) {
           icon.classList.add("fa-solid", "fa-x", "yellow");
         } else {
           icon.classList.add("fa-solid", "fa-o", "turquoise");
         }
-        // console.log({ currentPlayer, App, this: this });
-        // icon.classList.add("fa-solid", ...classNames[currentPlayer.id]);
         square.replaceChildren(icon);
 
         currentPlayer.clickedSquares.push(+square.id);
@@ -135,13 +140,7 @@ const App = {
         const gameStatus = App.getGameStatus();
         console.log(gameStatus);
 
-        App.state.currentPlayerID = currentPlayer.id === 1 ? 2:1;
-        this.state.currentPlayer2 = "dupa";
-        console.log(currentPlayer);
-
-        // console.log(
-        //   "this is the updated current player ID: " + App.state.currentPlayerID
-        // );
+        App.state.currentPlayerID = currentPlayer.id === 1 ? 2 : 1;
       });
     });
   },
