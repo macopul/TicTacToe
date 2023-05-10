@@ -54,12 +54,21 @@ const App = {
     ];
     const currentPlayer = this.state.currentPlayer;
 
+    const clickedSquaresAmount =
+      this.state.Players[0].clickedSquares.length +
+      this.state.Players[1].clickedSquares.length;
+
+    if (clickedSquaresAmount === 9) {
+      this.$.modalText.innerText = " TIE !";
+      this.$.modal.classList.remove("hidden");
+    }
+
     for (let pattern of winningPatterns) {
       const winDetected = pattern.every((square) =>
         currentPlayer.clickedSquares.includes(square)
       );
       if (winDetected) {
-        this.$.modalText.innerText = currentPlayer.name + " wins!";
+        this.$.modalText.innerText = currentPlayer.name + " wins !";
         this.$.modal.classList.remove("hidden");
       }
     }
