@@ -5,18 +5,43 @@ const App = {
     resetBtn: document.querySelector('[data-id="reset-btn"]'),
     newRonudBtn: document.querySelector('[data-id="new-round-btn"]'),
     squares: document.querySelectorAll('[data-id="square"]'),
+    modal: document.querySelector('[data-id="modal"]'),
+    modalText: document.querySelector('[data-id="modal-text"]'),
+    modalBtn: document.querySelector('[data-id="modal-btn"]'),
+    turn: document.querySelector('[data-id="turn"]'),
   },
 
   state: {
     Players: [
-      { id: 1, clickedSquares: [] },
-      { id: 2, clickedSquares: [] },
+      {
+        id: 1,
+        clickedSquares: [],
+        name: "Maciek",
+        signClass: "fa-x",
+        colorClass: "yellow",
+      },
+      {
+        id: 2,
+        clickedSquares: [],
+        name: "Angie",
+        signClass: "fa-o",
+        colorClass: "turquoise",
+      },
     ],
 
-    currentPlayerID: 1,
+    currentPlayer: null,
   },
 
-  getGameStatus(state) {
+  setCurrentPlayer(player) {
+    this.state.currentPlayer = player;
+    const playerTurnSign = this.$.turn.firstElementChild;
+    const playerTurnName = this.$.turn.lastElementChild;
+    playerTurnName.innerText = player.name;
+    playerTurnName.classList.add(player.colorClass);
+    playerTurnSign.classList.add(player.colorClass, player.signClass);
+  },
+
+  getGameStatus() {
     const winningPatterns = [
       [1, 2, 3],
       [4, 5, 6],
@@ -27,42 +52,21 @@ const App = {
       [1, 5, 9],
       [3, 5, 7],
     ];
+    const currentPlayer = this.state.currentPlayer;
 
-    const Player1Squares = state.Players[0].clickedSquares;
-    const Player2Squares = state.Players[1].clickedSquares;
-
-    let winner = null;
-
-    winningPatterns.forEach((pattern) => {
-      if (state.currentPlayerID === 1) {
-        const Player1Wins = pattern.every((v) => Player1Squares.includes(v));
-        if (Player1Wins) {
-          winner = "player1";
-        }
-      } else {
-        const Player2Wins = pattern.every((v) => Player2Squares.includes(v));
-        if (Player2Wins) {
-          winner = "player2";
-        }
+    for (let pattern of winningPatterns) {
+      const winDetected = pattern.every((square) =>
+        currentPlayer.clickedSquares.includes(square)
+      );
+      if (winDetected) {
+        this.$.modalText.innerText = currentPlayer.name + " wins!";
+        this.$.modal.classList.remove("hidden");
       }
-
-      // if (Player1Wins) {
-      //   winner = "player1";
-      // }
-
-      // if (Player2Wins) {
-      //   winner = "player2";
-      // }
-    });
-
-    console.log(Player1Squares);
-    return {
-      status: "in progress",
-      winner,
-    };
+    }
   },
 
   init() {
+    App.setCurrentPlayer(App.state.Players[0]);
     App.registerEventListeners();
   },
 
@@ -81,69 +85,81 @@ const App = {
 
     App.$.squares.forEach((square) => {
       square.addEventListener("click", (event) => {
-        const currentPlayerID = App.state.currentPlayerID;
-        const Players = App.state.Players;
-        const Player1 = Players[0];
-        const Player2 = Players[1];
+        const playerTurnName = App.$.turn.lastElementChild;
+        const playerTurnSign = App.$.turn.firstElementChild;
 
-        console.log(currentPlayerID);
+        const players = App.state.Players;
+        let currentPlayer = App.state.currentPlayer;
+        const allClickedSquares = [
+          ...players[0].clickedSquares,
+          ...players[1].clickedSquares,
+        ];
 
-        const currentPlayer = currentPlayerID === 1 ? Player1 : Player2;
-        // console.log(Player1.clickedSquares);
-        // console.log(Player2.clickedSquares);
-
-        const isSquareBusy = (squreID) => {
-          const isBusy =
-            App.state.Players[0].clickedSquares.find(
-              (square) => square === squreID
-            ) ||
-            App.state.Players[1].clickedSquares.find(
-              (square) => square === squreID
-            );
-
-          return isBusy !== undefined;
-        };
-
-        // console.log(isSquareBusy(+square.id));
-
-        if (isSquareBusy(+square.id)) {
+        if (allClickedSquares.includes(+square.id)) {
           return;
         }
 
-
-        // console.log(
-        //   "this is the current player" + JSON.stringify(currentPlayer)
-        // );
-
         const icon = document.createElement("i");
-        // const classNames = {
-        //   1: ["fa-x", "yellow"],
-        //   2: ["fa-o", "turquoise"],
-        // };
 
-        if (currentPlayer.id === 1) {
-          icon.classList.add("fa-solid", "fa-x", "yellow");
-        } else {
-          icon.classList.add("fa-solid", "fa-o", "turquoise");
-        }
-        // console.log({ currentPlayer, App, this: this });
-        // icon.classList.add("fa-solid", ...classNames[currentPlayer.id]);
+        icon.classList.add(
+          "fa-solid",
+          currentPlayer.colorClass,
+          currentPlayer.signClass
+        );
         square.replaceChildren(icon);
 
         currentPlayer.clickedSquares.push(+square.id);
 
-        const gameStatus = App.getGameStatus();
-        console.log(gameStatus);
+        App.getGameStatus();
 
-        App.state.currentPlayerID = currentPlayer.id === 1 ? 2:1;
-        this.state.currentPlayer2 = "dupa";
-        console.log(currentPlayer);
+        App.state.currentPlayer =
+          currentPlayer === players[0] ? players[1] : players[0];
 
-        // console.log(
-        //   "this is the updated current player ID: " + App.state.currentPlayerID
-        // );
+        playerTurnName.innerText = App.state.currentPlayer.name;
+
+        currentPlayer = App.state.currentPlayer;
+        const oppositePlayer =
+          currentPlayer === players[0] ? players[1] : players[0];
+
+        playerTurnSign.classList.add(
+          currentPlayer.colorClass,
+          currentPlayer.signClass
+        );
+
+        playerTurnSign.classList.remove(
+          oppositePlayer.colorClass,
+          oppositePlayer.signClass
+        );
+        playerTurnName.classList.add(currentPlayer.colorClass);
+        playerTurnName.classList.remove(oppositePlayer.colorClass);
       });
     });
+
+    const handleModalButtonClick = () => {
+      console.log("new game should start");
+
+      const playerTurnName = App.$.turn.lastElementChild;
+      const playerTurnSign = App.$.turn.firstElementChild;
+
+      App.state.currentPlayer = App.state.Players[0];
+      App.$.turn.lastElementChild.innerText = App.state.currentPlayer.name;
+      playerTurnSign.classList.remove("fa-o", "turquoise");
+      playerTurnSign.classList.add("fa-x", "yellow");
+      playerTurnName.classList.remove("turquoise");
+      playerTurnName.classList.add("yellow");
+
+      App.state.Players.forEach((player) => (player.clickedSquares = []));
+
+      this.$.modal.classList.add("hidden");
+
+      App.$.squares.forEach((square) => {
+        if (square.hasChildNodes()) {
+          square.firstChild.remove();
+        }
+      });
+    };
+
+    App.$.modalBtn.addEventListener("click", handleModalButtonClick);
   },
 };
 
