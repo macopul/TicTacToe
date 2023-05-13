@@ -12,6 +12,10 @@ export default class View {
     this.$.modalText = this.#qs('[data-id="modal-text"]');
     this.$.modalBtn = this.#qs('[data-id="modal-btn"]');
     this.$.turn = this.#qs('[data-id="turn"]');
+    this.$.p1wins = this.#qs(`[data-id="p1-wins"]`);
+    this.$.p2wins = this.#qs(`[data-id="p2-wins"]`);
+    this.$.ties = this.#qs(`[data-id="ties"]`);
+
     // Element lists
     this.$$.squares = this.#qsAll('[data-id="square"]');
 
@@ -20,9 +24,9 @@ export default class View {
     });
   }
 
-
   bindGamesResetEvent(handler) {
     this.$.resetBtn.addEventListener("click", handler);
+    this.$.modalBtn.addEventListener("click", handler);
   }
 
   bindNewRoundEvent(handler) {
@@ -30,8 +34,8 @@ export default class View {
   }
 
   bindPlayerMoveEvent(handler) {
-    this.$$.squares.forEach((Square1) => {
-      Square1.addEventListener("click", () => handler(Square1));
+    this.$$.squares.forEach((square) => {
+      square.addEventListener("click", () => handler(square));
     });
   }
 
@@ -41,15 +45,33 @@ export default class View {
   //   });
   // }
 
-  openModal(winner){
-      this.$.modal.classList.remove("hidden")
-      if (winner){
-        this.$.modalText.innerText = `${winner.name} win!`
-        return
-      }
-      this.$.modalText.innerText = "Tie !"
-      
+  openModal(winner) {
+    this.$.modal.classList.remove("hidden");
+    if (winner) {
+      this.$.modalText.innerText = `${winner.name} win!`;
+      return;
+    }
+    this.$.modalText.innerText = "Tie !";
   }
+
+  clearAllSquares() {
+    this.$$.squares.forEach((square) => square.replaceChildren());
+  }
+
+  closeModal() {
+    this.$.modal.classList.add("hidden");
+  }
+
+  // updateScoreBoard(winner) {
+  //   if (winner) {
+  //     if (winner.id === 1) {
+  //       this.$.p1wins.innerText = this.$.p1wins.innerText + 1;
+  //     } else if (winner.id === 2) {
+  //       this.$.p2wins.innerText = 1;
+  //     }
+  //   }
+  //   console.log("tie");
+  // }
 
   #toggleMenu() {
     this.$.menuItems.classList.toggle("hidden");
@@ -79,17 +101,16 @@ export default class View {
       ? parent.querySlector(selector)
       : document.querySelector(selector);
 
-    if(!el) throw new Error("Could nont find elements");
+    if (!el) throw new Error("Could nont find elements");
 
     return el;
   }
 
-  #qsAll(selector){
+  #qsAll(selector) {
     const elList = document.querySelectorAll(selector);
 
-    if(!elList) throw new Error("could not find elements");
+    if (!elList) throw new Error("could not find elements");
 
-    return elList
+    return elList;
   }
-
 }
