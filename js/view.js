@@ -1,3 +1,7 @@
+import Store from "./store.js";
+
+const store = new Store();
+
 export default class View {
   $ = {};
   $$ = {};
@@ -39,16 +43,67 @@ export default class View {
     });
   }
 
+  loadPlayerWins = (playerId) => {
+    const currentHistoryInLocalStorage = store.getHistoryInLocalStorage();
+
+    const gamesWithWins = currentHistoryInLocalStorage.currentRoundGames.filter(
+      (game) => game.Status.winner
+    );
+
+    if (gamesWithWins.length !== 0) {
+      const PlayerWins = gamesWithWins.filter(
+        game => game.Status.winner.id === playerId
+      );
+
+      if (playerId == 1) {
+        this.$.p1wins.innerText = `${PlayerWins.length} Wins`;
+      } else if (playerId == 2) {
+        this.$.p2wins.innerText = `${PlayerWins.length} Wins`;
+      }
+    }
+
+    const Ties = currentHistoryInLocalStorage.currentRoundGames.filter(
+      (game) => game.Status.winner === null
+    );
+
+    this.$.ties.innerText = `${Ties.length} Ties !`;
+
+  };
+
   // bindPlayerMoveEvent(handler) {
   //   this.$$.squares.forEach((Square1) => {
   //     Square1.addEventListener("click", handler);
   //   });
   // }
 
+  loadMovesFromLocalStorage(players) {
+    const movesFromLocalStorage =
+      JSON.parse(localStorage.getItem("current game moves")) || [];
+
+    if (movesFromLocalStorage.length == 1) {
+      this.setTurnIndicator(players[1]);
+    } else if (movesFromLocalStorage.length > 1) {
+      this.setTurnIndicator(
+        movesFromLocalStorage[movesFromLocalStorage.length - 2].player
+      );
+    }
+
+    this.$$.squares.forEach((square) => {
+      const matchedSquare = movesFromLocalStorage.find(
+        (squareLS) => squareLS.squareId === square.id
+      );
+
+      if (matchedSquare) {
+        this.handlePlayerMove(square, matchedSquare.player);
+      }
+    });
+  }
+
   openModal(winner) {
     this.$.modal.classList.remove("hidden");
     if (winner) {
       this.$.modalText.innerText = `${winner.name} win!`;
+      // console.log(store.)
       return;
     }
     this.$.modalText.innerText = "Tie !";

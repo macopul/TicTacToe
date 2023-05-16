@@ -1,12 +1,53 @@
+
 const initialValue = {
-  currentGameMoves: [],
+  currentGameMoves:
+    JSON.parse(localStorage.getItem("current game moves")) || [],
   history: {
-    currentRoundGames:[],
+    currentRoundGames: [],
     allGames: [],
-  }
+  },
 };
 
 export default class Store {
+  LOCAL_STORAGE_CURRENT_GAME_MOVES_KEY = "current game moves";
+  LOCAL_STORAGE_HISTORY_KEY = "history";
+
+  saveDataInStorageForKey = (key, data) => {
+    return localStorage.setItem(key, JSON.stringify(data));
+  };
+
+  getHistoryInLocalStorage = () => {
+    return (
+      JSON.parse(localStorage.getItem(this.LOCAL_STORAGE_HISTORY_KEY)) ||
+      initialValue.history
+    );
+  };
+
+  getCurrentMovesInLocalStorage = () => {
+    return JSON.parse(
+      localStorage.getItem(this.LOCAL_STORAGE_CURRENT_GAME_MOVES_KEY)
+    );
+  };
+
+  loadCurrentMovesInLocalStorage = () => {
+    this.saveDataInStorageForKey(this.LOCAL_STORAGE_CURRENT_GAME_MOVES_KEY, []);
+  };
+
+  loadHistoryInLocalStorage = () => {
+    console.log(this.getHistoryInLocalStorage());
+    this.saveDataInStorageForKey(
+      this.LOCAL_STORAGE_HISTORY_KEY,
+      this.getHistoryInLocalStorage()
+    );
+  };
+
+  // clearState = () => {
+  //   this.#state = initialValue
+  // }
+  // export const getThemeModeFromLocalStorage = () => {
+  //   return JSON.parse(localStorage.getItem(DARK_STORAGE_THEME_MODE));
+  // };
+
   #state = initialValue;
 
   constructor(players) {
@@ -15,6 +56,7 @@ export default class Store {
 
   get game() {
     // console.log("game was invoked");
+
     const state = this.#getState();
 
     const currentPlayer = this.players[state.currentGameMoves.length % 2];
@@ -54,6 +96,29 @@ export default class Store {
     };
   }
 
+  setCurrentGameRound = () => {
+    const currentHistoryInLocalStorage = this.getHistoryInLocalStorage();
+    const currentRoundGameInLocalStorage =
+      currentHistoryInLocalStorage.currentRoundGames;
+    currentRoundGameInLocalStorage.push({
+      Moves: this.game.moves,
+      Status: this.game.status,
+    });
+    this.saveDataInStorageForKey(
+      this.LOCAL_STORAGE_HISTORY_KEY,
+      currentHistoryInLocalStorage
+    );
+  };
+
+  getPlayerWins = (playerId) => {
+    const currentHistoryInLocalStorage = this.getHistoryInLocalStorage();
+    const PlayerWins = currentHistoryInLocalStorage.currentRoundGames.filter(
+      (game) => game.Status.winner.id === playerId
+    );
+    console.log(PlayerWins.length);
+    // console.log(PlayerWins.length);
+  };
+
   playerMove(squareId) {
     const state = this.#getState();
 
@@ -65,12 +130,25 @@ export default class Store {
     });
 
     this.#saveState(StateClone);
+
+    this.saveDataInStorageForKey(
+      this.LOCAL_STORAGE_CURRENT_GAME_MOVES_KEY,
+      this.game.moves
+    );
   }
 
-  clearAllSquaresInStore(){
-    this.#state = initialValue
+  clearCurrentGameMoves() {
+    this.saveDataInStorageForKey("current game moves", []);
   }
-  
+
+  clearAllSquaresInState() {
+    this.#state.currentGameMoves = [];
+  }
+
+  // clearAllSquaresInState() {
+  //   this.#state.currentGameMoves = [];
+  // }
+
   #getState() {
     return this.#state;
   }

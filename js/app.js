@@ -22,6 +22,11 @@ function init() {
   const view = new View();
   const store = new Store(players);
 
+  view.loadMovesFromLocalStorage(players);
+  store.loadCurrentMovesInLocalStorage();
+  store.loadHistoryInLocalStorage();
+  players.forEach((player) => view.loadPlayerWins(player.id));
+
   view.bindGamesResetEvent((event) => {
     console.log("Reset event");
   });
@@ -31,14 +36,13 @@ function init() {
   });
 
   view.bindPlayerMoveEvent((square) => {
-
     const existingMove = store.game.moves.find(
       (move) => move.squareId === square.id
     );
-    if (existingMove){
-      console.log("this square is occupied")
+    if (existingMove) {
+      console.log("this square is occupied");
       return;
-    } 
+    }
 
     view.handlePlayerMove(square, store.game.currentPlayer);
 
@@ -46,39 +50,20 @@ function init() {
 
     if (store.game.status.isComplete) {
       view.openModal(store.game.status.winner);
-      view.updateScoreBoard(store.game.status.winner);
+      store.setCurrentGameRound();
     }
 
     view.setTurnIndicator(store.game.currentPlayer);
   });
-  
+
   view.bindGamesResetEvent(() => {
-    view.clearAllSquares()
-    store.clearAllSquaresInStore()
-    view.closeModal()
+    players.forEach((player) => view.loadPlayerWins(player.id));
+    store.clearCurrentGameMoves();
+    store.clearAllSquaresInState();
+    view.clearAllSquares();
+    view.closeModal();
     view.setTurnIndicator(store.game.currentPlayer);
-
-  })
-
-  // view.bindPlayerMoveEvent((event) => {
-
-  //   const clcikedSquare = event.target
-
-  //   console.log(clcikedSquare)
-
-  //   const existingMove = store.game.moves.find(
-  //     move => move.squareId === event.id
-  //   );
-  //   if (existingMove) return;
-
-  //   console.log(clcikedSquare)
-
-  //   view.handlePlayerMove(clcikedSquare, store.game.currentPlayer);
-
-  //   store.playerMove(clcikedSquare.id);
-
-  //   view.setTurnIndicator(store.game.currentPlayer);
-  // });
+  });
 }
 
 window.addEventListener("load", init);
