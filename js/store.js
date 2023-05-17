@@ -1,16 +1,37 @@
 const initialValue = {
   currentGameMoves: [],
   history: {
-    currentRoundGames:[],
+    currentRoundGames: [],
     allGames: [],
-  }
+  },
 };
 
 export default class Store {
-  #state = initialValue;
-
-  constructor(players) {
+  constructor(key, players) {
     this.players = players;
+    this.storageKey = key;
+  }
+
+  get stats() {
+    console.log(this.#getState());
+    const state = this.#getState();
+
+    return {
+      playersWithWins: this.players.map((player) => {
+        const wins = state.history.currentRoundGames.filter(
+          (game) => game.status.winner?.id === player.id
+        ).length;
+
+        return {
+          ...player,
+          wins,
+        };
+      }),
+
+      ties: state.history.currentRoundGames.filter(
+        (game) => game.status.winner === null
+      ).length,
+    };
   }
 
   get game() {
@@ -67,12 +88,34 @@ export default class Store {
     this.#saveState(StateClone);
   }
 
-  clearAllSquaresInStore(){
-    this.#state = initialValue
+  reset() {
+    const stateClone = structuredClone(this.#getState());
+
+    const { status, moves } = this.game;
+
+    if (status.isComplete) {
+      stateClone.history.currentRoundGames.push({ moves, status });
+    }
+
+    stateClone.currentGameMoves = [];
+
+    this.#saveState(stateClone);
   }
-  
+
+  newRound() {
+    this.reset();
+
+    const stateClone = structuredClone(this.#getState());
+    stateClone.history.allGames.push(...stateClone.history.currentRoundGames);
+    stateClone.history.currentRoundGames = [];
+
+    this.#saveState(stateClone);
+    console.log(this.#getState());
+  }
+
   #getState() {
-    return this.#state;
+    const item = window.localStorage.getItem(this.storageKey);
+    return item ? JSON.parse(item) : initialValue;
   }
 
   #saveState(stateOrFn) {
@@ -91,6 +134,6 @@ export default class Store {
         throw new Error("Invalid argument passed to saveState");
     }
 
-    this.#state = newState;
+    window.localStorage.setItem(this.storageKey, JSON.stringify(newState));
   }
 }

@@ -16,7 +16,6 @@ export default class View {
     this.$.p2wins = this.#qs(`[data-id="p2-wins"]`);
     this.$.ties = this.#qs(`[data-id="ties"]`);
 
-    // Element lists
     this.$$.squares = this.#qsAll('[data-id="square"]');
 
     this.$.menuBtn.addEventListener("click", (event) => {
@@ -39,11 +38,11 @@ export default class View {
     });
   }
 
-  // bindPlayerMoveEvent(handler) {
-  //   this.$$.squares.forEach((Square1) => {
-  //     Square1.addEventListener("click", handler);
-  //   });
-  // }
+  updatesScoreBoard(p1wins, p2wins, ties) {
+    this.$.p1wins.innerText = `${p1wins} wins`;
+    this.$.p2wins.innerText = `${p2wins} wins`;
+    this.$.ties.innerText = `${ties} ties`;
+  }
 
   openModal(winner) {
     this.$.modal.classList.remove("hidden");
@@ -58,20 +57,18 @@ export default class View {
     this.$$.squares.forEach((square) => square.replaceChildren());
   }
 
+  loadExistingMoves(moves) {
+    this.$$.squares.forEach((square) => {
+      const existingMove = moves.find((move) => move.squareId === square.id);
+      if (existingMove) {
+        this.handlePlayerMove(square, existingMove.player);
+      }
+    });
+  }
+
   closeModal() {
     this.$.modal.classList.add("hidden");
   }
-
-  // updateScoreBoard(winner) {
-  //   if (winner) {
-  //     if (winner.id === 1) {
-  //       this.$.p1wins.innerText = this.$.p1wins.innerText + 1;
-  //     } else if (winner.id === 2) {
-  //       this.$.p2wins.innerText = 1;
-  //     }
-  //   }
-  //   console.log("tie");
-  // }
 
   #toggleMenu() {
     this.$.menuItems.classList.toggle("hidden");
