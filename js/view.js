@@ -46,28 +46,24 @@ export default class View {
   loadPlayerWins = (playerId) => {
     const currentHistoryInLocalStorage = store.getHistoryInLocalStorage();
 
-    const gamesWithWins = currentHistoryInLocalStorage.currentRoundGames.filter(
-      (game) => game.Status.winner
-    );
+    const winsQuantity = currentHistoryInLocalStorage.currentRoundGames.filter(
+      (game) => game.Status.winner?.id === playerId
+    ).length;
 
-    if (gamesWithWins.length !== 0) {
-      const PlayerWins = gamesWithWins.filter(
-        game => game.Status.winner.id === playerId
-      );
+    console.log(winsQuantity);
 
-      if (playerId == 1) {
-        this.$.p1wins.innerText = `${PlayerWins.length} Wins`;
-      } else if (playerId == 2) {
-        this.$.p2wins.innerText = `${PlayerWins.length} Wins`;
-      }
+    if (playerId == 1) {
+      this.$.p1wins.innerText = `${winsQuantity} Wins`;
+    } else if (playerId == 2) {
+      this.$.p2wins.innerText = `${winsQuantity} Wins`;
     }
+    // }
 
     const Ties = currentHistoryInLocalStorage.currentRoundGames.filter(
       (game) => game.Status.winner === null
     );
 
-    this.$.ties.innerText = `${Ties.length} Ties !`;
-
+    this.$.ties.innerText = `${Ties.length} Ties`;
   };
 
   // bindPlayerMoveEvent(handler) {
