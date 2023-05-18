@@ -15,6 +15,7 @@ export default class View {
     this.$.p1wins = this.#qs(`[data-id="p1-wins"]`);
     this.$.p2wins = this.#qs(`[data-id="p2-wins"]`);
     this.$.ties = this.#qs(`[data-id="ties"]`);
+    this.$.grid = this.#qs('[data-id="grid"]');
 
     this.$$.squares = this.#qsAll('[data-id="square"]');
 
@@ -33,18 +34,41 @@ export default class View {
   }
 
   bindPlayerMoveEvent(handler) {
-    this.$$.squares.forEach((square) => {
-      square.addEventListener("click", () => handler(square));
-    });
+    this.#delegate(this.$.grid, '[data-id= "square"]', "click", handler);
   }
 
-  updatesScoreBoard(p1wins, p2wins, ties) {
+  render(game, stats) {
+    const { playersWithWins, ties } = stats;
+
+    const {
+      moves,
+      currentPlayer,
+      status: { isComplete, winner },
+    } = game;
+
+    this.#closeModal();
+    this.#clearAllSquares();
+    this.#updatesScoreBoard(
+      playersWithWins[0].wins,
+      playersWithWins[1].wins,
+      ties
+    );
+    this.#loadExistingMoves(moves);
+
+    if (isComplete) {
+      this.#openModal(winner);
+      return;
+    }
+    this.#setTurnIndicator(currentPlayer);
+  }
+
+  #updatesScoreBoard(p1wins, p2wins, ties) {
     this.$.p1wins.innerText = `${p1wins} wins`;
     this.$.p2wins.innerText = `${p2wins} wins`;
     this.$.ties.innerText = `${ties} ties`;
   }
 
-  openModal(winner) {
+  #openModal(winner) {
     this.$.modal.classList.remove("hidden");
     if (winner) {
       this.$.modalText.innerText = `${winner.name} win!`;
@@ -53,11 +77,11 @@ export default class View {
     this.$.modalText.innerText = "Tie !";
   }
 
-  clearAllSquares() {
+  #clearAllSquares() {
     this.$$.squares.forEach((square) => square.replaceChildren());
   }
 
-  loadExistingMoves(moves) {
+  #loadExistingMoves(moves) {
     this.$$.squares.forEach((square) => {
       const existingMove = moves.find((move) => move.squareId === square.id);
       if (existingMove) {
@@ -66,7 +90,7 @@ export default class View {
     });
   }
 
-  closeModal() {
+  #closeModal() {
     this.$.modal.classList.add("hidden");
   }
 
@@ -81,7 +105,7 @@ export default class View {
     squareEl.replaceChildren(icon);
   }
 
-  setTurnIndicator(player) {
+  #setTurnIndicator(player) {
     const icon = document.createElement("i");
     const label = document.createElement("p");
 
@@ -109,5 +133,13 @@ export default class View {
     if (!elList) throw new Error("could not find elements");
 
     return elList;
+  }
+
+  #delegate(el, selector, eventKey, handler) {
+    el.addEventListener(eventKey, (event) => {
+      if (event.target.matches(selector)) {
+        handler(event.target);
+      }
+    });
   }
 }

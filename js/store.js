@@ -6,14 +6,14 @@ const initialValue = {
   },
 };
 
-export default class Store {
+export default class Store extends EventTarget {
   constructor(key, players) {
+    super();
     this.players = players;
     this.storageKey = key;
   }
 
   get stats() {
-    console.log(this.#getState());
     const state = this.#getState();
 
     return {
@@ -110,7 +110,6 @@ export default class Store {
     stateClone.history.currentRoundGames = [];
 
     this.#saveState(stateClone);
-    console.log(this.#getState());
   }
 
   #getState() {
@@ -133,7 +132,9 @@ export default class Store {
       default:
         throw new Error("Invalid argument passed to saveState");
     }
-
     window.localStorage.setItem(this.storageKey, JSON.stringify(newState));
+
+    const stateChangeEvent = new Event('statechange')
+    this.dispatchEvent(stateChangeEvent);
   }
 }
