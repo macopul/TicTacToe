@@ -42,14 +42,14 @@ function init() {
 
   view.bindPlayerMoveEvent((square) => {
     const existingMove = store.game.moves.find(
-      (move) => move.squareId === square.id
+      (move) => move.squareId === +square.id
     );
     if (existingMove) {
       console.log("this square is occupied");
       return;
     }
 
-    store.playerMove(square.id);
+    store.playerMove(+square.id);
   });
 }
 

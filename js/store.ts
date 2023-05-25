@@ -1,16 +1,16 @@
-const initialValue = {
+import type { Player, Move, GameStatus, GameState } from "./type";
+
+const initialValue: GameState = {
   currentGameMoves: [],
   history: {
     currentRoundGames: [],
     allGames: [],
   },
 };
-
+   
 export default class Store extends EventTarget {
-  constructor(key, players) {
+  constructor(private readonly storageKey: string, private readonly players: Player[]) {
     super();
-    this.players = players;
-    this.storageKey = key;
   }
 
   get stats() {
@@ -51,7 +51,8 @@ export default class Store extends EventTarget {
       [3, 5, 7],
     ];
 
-    let winner = null;
+
+    let winner: Player | null = null ;
 
     for (const player of this.players) {
       const selectedSquaresIds = state.currentGameMoves
@@ -75,17 +76,17 @@ export default class Store extends EventTarget {
     };
   }
 
-  playerMove(squareId) {
+  playerMove(squareId: number) {
     const state = this.#getState();
 
-    const StateClone = structuredClone(state);
+    const stateClone = structuredClone(state);
 
-    StateClone.currentGameMoves.push({
+    stateClone.currentGameMoves.push({
       squareId,
       player: this.game.currentPlayer,
     });
 
-    this.#saveState(StateClone);
+    this.#saveState(stateClone);
   }
 
   reset() {
@@ -105,7 +106,7 @@ export default class Store extends EventTarget {
   newRound() {
     this.reset();
 
-    const stateClone = structuredClone(this.#getState());
+    const stateClone = structuredClone(this.#getState()) as GameState;
     stateClone.history.allGames.push(...stateClone.history.currentRoundGames);
     stateClone.history.currentRoundGames = [];
 
@@ -114,12 +115,11 @@ export default class Store extends EventTarget {
 
   #getState() {
     const item = window.localStorage.getItem(this.storageKey);
-    return item ? JSON.parse(item) : initialValue;
+    return item ? JSON.parse(item) as GameState : initialValue;
   }
 
-  #saveState(stateOrFn) {
+  #saveState(stateOrFn: GameState | ((prevState: GameState) => GameState) ) {
     const prevState = this.#getState();
-
     let newState;
 
     switch (typeof stateOrFn) {
@@ -134,7 +134,7 @@ export default class Store extends EventTarget {
     }
     window.localStorage.setItem(this.storageKey, JSON.stringify(newState));
 
-    const stateChangeEvent = new Event('statechange')
+    const stateChangeEvent = new Event("statechange");
     this.dispatchEvent(stateChangeEvent);
   }
 }
