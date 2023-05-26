@@ -1,4 +1,4 @@
-import type { Game, Move, Player } from "./type";
+import type { Game, GameStats, Move, Player } from "./type";
 import type Store from "./store";
 
 export default class View {
@@ -40,7 +40,10 @@ export default class View {
     this.#delegate(this.$.grid, '[data-id= "square"]', "click", handler);
   }
 
-  render(game: Store["game"], stats: Store["stats"]) {
+  // render(game: Game & {currentPlayer: Player}, stats: GameStats) {
+  //   const { playersWithWins, ties } = stats;
+
+  render(game: Game , stats: GameStats) {
     const { playersWithWins, ties } = stats;
 
     const {

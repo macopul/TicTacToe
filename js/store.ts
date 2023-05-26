@@ -1,4 +1,4 @@
-import type { Player, Move, GameStatus, GameState } from "./type";
+import type { Player, GameState, Game, GameStats } from "./type";
 
 const initialValue: GameState = {
   currentGameMoves: [],
@@ -7,13 +7,16 @@ const initialValue: GameState = {
     allGames: [],
   },
 };
-   
+
 export default class Store extends EventTarget {
-  constructor(private readonly storageKey: string, private readonly players: Player[]) {
+  constructor(
+    private readonly storageKey: string,
+    private readonly players: Player[]
+  ) {
     super();
   }
 
-  get stats() {
+  get stats(): GameStats {
     const state = this.#getState();
 
     return {
@@ -34,8 +37,7 @@ export default class Store extends EventTarget {
     };
   }
 
-  get game() {
-    // console.log("game was invoked");
+  get game(): Game {
     const state = this.#getState();
 
     const currentPlayer = this.players[state.currentGameMoves.length % 2];
@@ -51,8 +53,7 @@ export default class Store extends EventTarget {
       [3, 5, 7],
     ];
 
-
-    let winner: Player | null = null ;
+    let winner = null;
 
     for (const player of this.players) {
       const selectedSquaresIds = state.currentGameMoves
@@ -115,10 +116,10 @@ export default class Store extends EventTarget {
 
   #getState() {
     const item = window.localStorage.getItem(this.storageKey);
-    return item ? JSON.parse(item) as GameState : initialValue;
+    return item ? (JSON.parse(item) as GameState) : initialValue;
   }
 
-  #saveState(stateOrFn: GameState | ((prevState: GameState) => GameState) ) {
+  #saveState(stateOrFn: GameState | ((prevState: GameState) => GameState)) {
     const prevState = this.#getState();
     let newState;
 
