@@ -32,6 +32,6 @@ export type GameState = {
   currentGameMoves: Move[];
   history: {
     currentRoundGames: Game[];
-    allGames: Game[];
+    allGames: Game[]; 
   };
 };
