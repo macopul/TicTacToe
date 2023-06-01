@@ -10,10 +10,13 @@
     "babel-loader": "^9.1.2",
     "typescript": "^5.0.4",
     "webpack": "^5.84.1",
-    "webpack-cli": "^5.1.1"
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.0"
   },
   "scripts": {
     "build": "webpack",
+    "dev": "webpack serve",
+    "build:prod": "NODE_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
