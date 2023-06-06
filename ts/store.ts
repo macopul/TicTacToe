@@ -37,7 +37,7 @@ export default class Store extends EventTarget {
     };
   }
 
-  get game(): Game {
+  get game() {
     const state = this.#getState();
 
     const currentPlayer = this.players[state.currentGameMoves.length % 2];

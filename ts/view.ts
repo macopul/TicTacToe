@@ -43,7 +43,7 @@ export default class View {
   // render(game: Game & {currentPlayer: Player}, stats: GameStats) {
   //   const { playersWithWins, ties } = stats;
 
-  render(game: Game , stats: GameStats) {
+  render(game: Store["game"] , stats: Store["stats"]) {
     const { playersWithWins, ties } = stats;
 
     const {
