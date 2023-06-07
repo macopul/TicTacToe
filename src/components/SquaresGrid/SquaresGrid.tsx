@@ -1,6 +1,9 @@
 import { useState } from "react";
 import "./SquaresGrid.css";
 import classNames from "classnames";
+import { DerivedGame, DerivedGameStats } from "../../../ts/store";
+import { derivedGame } from "../../App";
+import { GameState, Move } from "../../../ts/type";
 
 // export default function SquaresGrid() {
 //   return (
@@ -18,18 +21,29 @@ import classNames from "classnames";
 //   );
 // }
 
-export default function SquaresGrid() {
-
-  const squareIcons = ['fa-x turquoise', 'fa-o yellow']
-
-  const [icon, setIcon] = useState(squareIcons[1])
-
+export default function SquaresGrid({ game, onPlay }) {
   return (
     <>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((squareId) => {
+        const existingMove = game.moves.find(
+          (move) => move.squareId === squareId
+        );
+
         return (
-          <div key={squareId} className="square shadow">
-            <i className= {classNames('fa-solid', icon)}></i>
+          <div
+            key={squareId}
+            className="square shadow"
+            onClick={() => onPlay(squareId, game.currentPlayer)}
+          >
+            {existingMove && (
+              <i
+                className={classNames(
+                  "fa-solid",
+                  existingMove.player.colorClass,
+                  existingMove.player.iconClass
+                )}
+              ></i>
+            )}
           </div>
         );
       })}

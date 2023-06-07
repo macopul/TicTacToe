@@ -6,7 +6,8 @@ import Modal from "./components/Modal/Modal";
 import SquaresGrid from "./components/SquaresGrid/SquaresGrid";
 import Stats from "./components/Stats/Stats";
 import TurnIndicator from "./components/TurnIndicator/TurnIndicator";
-import { GameState } from "../ts/type";
+import { Game, GameState, Player } from "../ts/type";
+import { DerivedGame, DerivedGameStats } from "../ts/store";
 
 const players = [
   {
@@ -23,8 +24,7 @@ const players = [
   },
 ];
 
-
-function derivedGame(state: GameState) {
+export function derivedGame(state: GameState) {
   const currentPlayer = players[state.currentGameMoves.length % 2];
 
   const winningPatterns = [
@@ -60,53 +60,60 @@ function derivedGame(state: GameState) {
       winner,
     },
   };
-
 }
 
-function derivedStats(state: GameState) {
-   return {
-     playersWithWins: players.map((player) => {
-       const wins = state.history.currentRoundGames.filter(
-         (game) => game.status.winner?.id === player.id
-       ).length;
+export function derivedStats(state: GameState) {
+  return {
+    playersWithWins: players.map((player) => {
+      const wins = state.history.currentRoundGames.filter(
+        (game) => game.status.winner?.id === player.id
+      ).length;
 
-       return {
-         ...player,
-         wins,
-       };
-     }),
+      return {
+        ...player,
+        wins,
+      };
+    }),
 
-     ties: state.history.currentRoundGames.filter(
-       (game) => game.status.winner === null
-     ).length,
-   };
+    ties: state.history.currentRoundGames.filter(
+      (game) => game.status.winner === null
+    ).length,
+  };
 }
-
 
 export default function App() {
-
-  
-  const [state, setState] = useState({
+  const [state, setState] = useState<GameState>({
     currentGameMoves: [],
     history: {
       currentRoundGames: [],
       allGames: [],
     },
   });
-  
-  const game = derivedGame(state);
-  const stats = derivedStats(state);
 
-  console.log(game);
+  const dGame: DerivedGame = derivedGame(state);
+  const stats: DerivedGameStats = derivedStats(state);
+
+  function handlePlayerMove(squareId:number, player:Player){
+    setState((prev) => {
+      const stateClone = structuredClone(prev);
+      stateClone.currentGameMoves.push({
+        squareId,
+        player,
+      })
+
+      return stateClone
+    })
+  }
+
+  console.log(dGame);
   console.log(stats);
-  
 
   return (
     <>
       <div className="grid" data-id="grid">
         <TurnIndicator />
         <Menu onAction={(action) => console.log(action)} />
-        <SquaresGrid />
+        <SquaresGrid game = {dGame} onPlay={handlePlayerMove} />
         <Stats />
       </div>
       <Footer />
