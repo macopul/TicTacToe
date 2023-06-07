@@ -1,0 +1,14 @@
+
+.square {
+  background-color: var(--gray);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+}
+
+.square:hover {
+  cursor: pointer;
+  opacity: 90%;
+}
