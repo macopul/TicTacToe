@@ -1,11 +1,16 @@
 import "./Modal.css";
 
-export default function Modal() {
+type ModalProps = {
+  message : string;
+  onClick():void;
+}
+
+export default function Modal({message, onClick}:ModalProps) {
   return (
-    <div className="modal hidden">
+    <div className="modal">
       <div className="modal-contents">
-        <p>Player 1 wins!</p>
-        <button>Play again</button>
+        <p>{message}</p>
+        <button onClick={onClick}>Play again</button>
       </div>
     </div>
   );

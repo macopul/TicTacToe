@@ -90,34 +90,64 @@ export default function App() {
     },
   });
 
-  const dGame: DerivedGame = derivedGame(state);
-  const stats: DerivedGameStats = derivedStats(state);
+  const game = derivedGame(state);
+  const stats = derivedStats(state);
 
-  function handlePlayerMove(squareId:number, player:Player){
+  function resetGame(isNewRound: boolean) {
+    setState((prev) => {
+      const stateClone = structuredClone(prev);
+
+      const { status, moves } = game;
+
+      if (status.isComplete) {
+        stateClone.history.currentRoundGames.push({ moves, status });
+      }
+
+      stateClone.currentGameMoves = [];
+
+      if (isNewRound) {
+        stateClone.history.allGames.push(
+          ...stateClone.history.currentRoundGames
+        );
+        stateClone.history.currentRoundGames = [];
+      }
+
+      return stateClone;
+    });
+  }
+
+  function handlePlayerMove(squareId: number, player: Player) {
     setState((prev) => {
       const stateClone = structuredClone(prev);
       stateClone.currentGameMoves.push({
         squareId,
         player,
-      })
+      });
 
-      return stateClone
-    })
+      return stateClone;
+    });
   }
 
-  console.log(dGame);
+  console.log(game);
   console.log(stats);
 
   return (
     <>
       <div className="grid" data-id="grid">
         <TurnIndicator />
-        <Menu onAction={(action) => console.log(action)} />
-        <SquaresGrid game = {dGame} onPlay={handlePlayerMove} />
-        <Stats />
+        <Menu onAction={(action) => resetGame(action === "new-round")} />
+        <SquaresGrid game={game} onPlay={handlePlayerMove} />
+        <Stats stats={stats} />
       </div>
       <Footer />
-      <Modal />
+      {game.status.isComplete && (
+        <Modal
+          message={
+            game.status.winner ? `${game.status.winner?.name} wins` : "Tie"
+          }
+          onClick={() => resetGame(false)}
+        />
+      )}
     </>
   );
 }

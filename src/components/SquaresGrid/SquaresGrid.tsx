@@ -3,7 +3,7 @@ import "./SquaresGrid.css";
 import classNames from "classnames";
 import { DerivedGame, DerivedGameStats } from "../../../ts/store";
 import { derivedGame } from "../../App";
-import { GameState, Move } from "../../../ts/type";
+import { GameState, Move, Player } from "../../../ts/type";
 
 // export default function SquaresGrid() {
 //   return (
@@ -21,7 +21,12 @@ import { GameState, Move } from "../../../ts/type";
 //   );
 // }
 
-export default function SquaresGrid({ game, onPlay }) {
+type SquaresGridProps = {
+  game: DerivedGame;
+  onPlay: (squareId: number, player: Player) => void;
+};
+
+export default function SquaresGrid({ game, onPlay }: SquaresGridProps) {
   return (
     <>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((squareId) => {
@@ -33,7 +38,12 @@ export default function SquaresGrid({ game, onPlay }) {
           <div
             key={squareId}
             className="square shadow"
-            onClick={() => onPlay(squareId, game.currentPlayer)}
+            onClick={() => {
+              if (existingMove) {
+                return;
+              }
+              onPlay(squareId, game.currentPlayer);
+            }}
           >
             {existingMove && (
               <i

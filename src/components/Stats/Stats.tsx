@@ -1,6 +1,11 @@
+import { GameStats } from '../../../ts/type';
 import './Stats.css'
 
-export default function Stats() {
+type StatsProps = {
+  stats : GameStats
+}
+
+export default function Stats({stats} : StatsProps) {
   return (
     <>
       <div
@@ -8,21 +13,21 @@ export default function Stats() {
         style={{ backgroundColor: "var(--turquoise)" }}
       >
         <p>Player 1</p>
-        <span data-id="p1-wins">0 Wins</span>
+        <span data-id="p1-wins">{stats.playersWithWins[0].wins} Wins</span>
       </div>
       <div
         className="score shadow"
         style={{ backgroundColor: "var(--light-gray)" }}
       >
         <p>Ties</p>
-        <span data-id="ties">0</span>
+        <span data-id="ties">{stats.ties}</span>
       </div>
       <div
         className="score shadow"
         style={{ backgroundColor: "var(--yellow)" }}
       >
         <p>Player 2</p>
-        <span data-id="p2-wins">0 Wins</span>
+        <span data-id="p2-wins">{stats.playersWithWins[1].wins} Wins</span>
       </div>
     </>
   );
