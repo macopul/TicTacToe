@@ -8,8 +8,8 @@ type TurnIndicatorProps = {
 export default function TurnIndicator ({currentPlayer}: TurnIndicatorProps) {
   return (
     <div className="turn" data-id="turn">
-      <i className={[currentPlayer.iconClass, currentPlayer.colorClass].join(' ')}></i>
-      <p className={currentPlayer.colorClass}>Player 1, you're up!</p>
+      <i className={[currentPlayer.iconClass, currentPlayer.colorClass, 'fa-solid'].join(' ')}></i>
+      <p className={currentPlayer.colorClass}>Player {currentPlayer.id}, you're up!</p>
     </div>
   );
 }

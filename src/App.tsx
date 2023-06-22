@@ -128,9 +128,6 @@ export default function App() {
     });
   }
 
-  console.log(game);
-  console.log(stats);
-
   return (
     <>
       <div className="grid" data-id="grid">
