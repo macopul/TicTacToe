@@ -1,10 +1,15 @@
+import { Player } from '../../../ts/type';
 import './TurnIndicator.css'
 
-export default function TurnIndicator () {
+type TurnIndicatorProps = {
+  currentPlayer: Player
+}
+
+export default function TurnIndicator ({currentPlayer}: TurnIndicatorProps) {
   return (
     <div className="turn" data-id="turn">
-      <i className="fa-solid fa-x turquoise"></i>
-      <p className="turquoise">Player 1, you're up!</p>
+      <i className={[currentPlayer.iconClass, currentPlayer.colorClass].join(' ')}></i>
+      <p className={currentPlayer.colorClass}>Player 1, you're up!</p>
     </div>
   );
 }

@@ -134,7 +134,7 @@ export default function App() {
   return (
     <>
       <div className="grid" data-id="grid">
-        <TurnIndicator />
+        <TurnIndicator currentPlayer={game.currentPlayer} />
         <Menu onAction={(action) => resetGame(action === "new-round")} />
         <SquaresGrid game={game} onPlay={handlePlayerMove} />
         <Stats stats={stats} />
