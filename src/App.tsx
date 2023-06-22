@@ -8,6 +8,7 @@ import Stats from "./components/Stats/Stats";
 import TurnIndicator from "./components/TurnIndicator/TurnIndicator";
 import { Game, GameState, Player } from "../ts/type";
 import { DerivedGame, DerivedGameStats } from "../ts/store";
+import { useLocalStorage } from "./useLocalStorage";
 
 const players = [
   {
@@ -82,13 +83,16 @@ export function derivedStats(state: GameState) {
 }
 
 export default function App() {
-  const [state, setState] = useState<GameState>({
+
+  const initialState: GameState = {
     currentGameMoves: [],
     history: {
       currentRoundGames: [],
       allGames: [],
     },
-  });
+  };
+
+  const [state, setState] = useLocalStorage("game-state-key", initialState);
 
   const game = derivedGame(state);
   const stats = derivedStats(state);
