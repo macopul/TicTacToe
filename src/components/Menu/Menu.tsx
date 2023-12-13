@@ -19,7 +19,7 @@ export default function Menu({ onAction }: Props) {
   return (
     <div className="menu">
       <button className="menu-btn" onClick={() => setMenuOpen((prev) => !prev)}>
-        Actions
+        Actions!
         <i
           className={classNames(
             menuOpen ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down"
